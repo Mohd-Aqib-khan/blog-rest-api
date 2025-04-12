@@ -1,6 +1,5 @@
-// facebook-auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 interface FacebookResponse {
   id: string;
@@ -12,6 +11,7 @@ interface FacebookResponse {
     };
   };
 }
+
 @Injectable()
 export class FacebookAuthService {
   async verifyFacebookToken(token: string): Promise<{
@@ -21,20 +21,11 @@ export class FacebookAuthService {
     picture: string;
     provider: string;
   }> {
+    let response: AxiosResponse<FacebookResponse | null>;
     try {
-      const response = await axios.get<FacebookResponse>(
+      response = await axios.get<FacebookResponse>(
         `https://graph.facebook.com/me?fields=id,name,email,picture&access_token=${token}`,
       );
-
-      const { id, name, email, picture } = response.data;
-
-      return {
-        sub: id,
-        name,
-        email,
-        picture: picture?.data?.url,
-        provider: 'facebook',
-      };
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         console.error(
@@ -47,8 +38,24 @@ export class FacebookAuthService {
           error,
         );
       }
-
       throw new UnauthorizedException('Invalid Facebook access token');
     }
+
+    const { id, name, email, picture } = response.data as FacebookResponse;
+
+    // Validate required fields after successful API call
+    if (!id || !name || !email || !picture?.data?.url) {
+      throw new UnauthorizedException(
+        'Missing required fields in Facebook response',
+      );
+    }
+
+    return {
+      sub: id,
+      name,
+      email,
+      picture: picture.data.url,
+      provider: 'facebook',
+    };
   }
 }

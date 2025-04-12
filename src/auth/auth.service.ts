@@ -1,9 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
+import { User } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
 import bcrypt from 'bcrypt';
-import { GoogleAuthService } from './google-auth/google-auth.service';
 import { AuthToken } from './interfaces/auth.interface';
 
 @Injectable()
@@ -11,7 +10,6 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
-    private googleAuthService: GoogleAuthService,
   ) {}
 
   async validateOAuthLogin(profile: {
@@ -59,6 +57,7 @@ export class AuthService {
       password: hashedPassword,
     } as User;
     const insertedUser: User = await this.usersService.create(newUser);
+    console.log('insertedUser#$', insertedUser);
     return this.login(insertedUser);
   }
 }

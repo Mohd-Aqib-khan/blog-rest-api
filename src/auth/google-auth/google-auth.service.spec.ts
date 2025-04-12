@@ -83,7 +83,6 @@ describe('GoogleAuthService', () => {
     expect(mockLoginTicket.getPayload).toHaveBeenCalled();
   });
 
-
   it('should throw UnauthorizedException for an invalid or expired token', async () => {
     oauth2Client.verifyIdToken.mockRejectedValueOnce(
       new Error('Invalid token'),

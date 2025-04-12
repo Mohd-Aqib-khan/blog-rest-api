@@ -20,10 +20,12 @@ export enum SubscriptionType {
 export class CreateUserDto {
   @IsString()
   @IsEmpty()
+  @IsOptional()
   provider: string;
 
   @IsString()
   @IsEmpty()
+  @IsOptional()
   providerId: string;
 
   @IsString()
@@ -35,8 +37,7 @@ export class CreateUserDto {
   email: string;
 
   @IsEnum(SubscriptionType)
-  @IsNotEmpty()
-  subscriptionType: SubscriptionType;
+  subscriptionType: SubscriptionType = SubscriptionType.FREE;
 
   @IsDate()
   @IsNotEmpty()

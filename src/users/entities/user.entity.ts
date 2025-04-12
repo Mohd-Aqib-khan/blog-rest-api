@@ -6,12 +6,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Post } from '../../posts/entities/post.entity';
+import { SubscriptionType } from '../dto/create-user.dto';
 
-export enum SubscriptionType {
-  FREE = 'FREE',
-  PREMIUM = 'PREMIUM',
-  ENTERPRISE = 'ENTERPRISE',
-}
 
 @Entity('users') // Optional: specify table name
 export class User {
