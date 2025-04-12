@@ -3,12 +3,13 @@ global.crypto = require('crypto');
 
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { ResponseInterceptor } from './common/interceptors/response-interceptor/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: ['http://localhost:4200'], // 👈 Allow Angular frontend only
+    origin: ['http://localhost:4200', 'https://blog-web-app-rose.vercel.app/'], // 👈 Allow Angular frontend only
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
@@ -20,6 +21,8 @@ async function bootstrap() {
       transform: true, // enables auto-transform from plain to class
     }),
   );
+
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   await app.listen(process.env.PORT ?? 5000);
 }

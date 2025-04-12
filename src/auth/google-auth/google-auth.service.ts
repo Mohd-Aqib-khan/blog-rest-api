@@ -1,11 +1,10 @@
-// google-auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { OAuth2Client } from 'google-auth-library';
 import { GooglePayload } from './types/google-user.type';
 
 @Injectable()
 export class GoogleAuthService {
-  private client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+  constructor(private client: OAuth2Client) {}
 
   async verifyOAuthToken(token: string): Promise<GooglePayload> {
     try {
@@ -24,7 +23,6 @@ export class GoogleAuthService {
           sub: payload.sub,
         };
       }
-
       throw new UnauthorizedException('No payload returned from Google');
     } catch (error) {
       console.error('Invalid or expired token', error);

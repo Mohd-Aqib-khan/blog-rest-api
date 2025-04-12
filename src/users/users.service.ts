@@ -27,7 +27,7 @@ export class UsersService {
     providerId: string;
     name: string;
     provider: string;
-  }) {
+  }): Promise<User> {
     const user = await this.userRepository.findOneBy({
       email: userDetails.email,
     });

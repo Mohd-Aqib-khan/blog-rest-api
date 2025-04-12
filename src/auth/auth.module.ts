@@ -9,6 +9,7 @@ import { LocalStrategy } from './local.strategy';
 import { GoogleAuthService } from './google-auth/google-auth.service';
 import { FacebookAuthService } from './facebook-auth/facebook-auth.service';
 import { JwtStrategy } from './jwt.strategy';
+import { OAuth2Client } from 'google-auth-library';
 
 @Module({
   imports: [
@@ -31,6 +32,10 @@ import { JwtStrategy } from './jwt.strategy';
     GoogleAuthService,
     FacebookAuthService,
     JwtStrategy,
+    {
+      provide: OAuth2Client,
+      useValue: new OAuth2Client(process.env.GOOGLE_CLIENT_ID), // Pass clientId here
+    },
   ],
   exports: [JwtModule, JwtStrategy],
 })

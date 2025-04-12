@@ -1,14 +1,10 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 import { GoogleAuthService } from './google-auth/google-auth.service';
-import { GooglePayload } from './google-auth/types/google-user.type';
+import { AuthToken } from './interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -23,8 +19,7 @@ export class AuthService {
     email: string;
     name: string;
     provider: string;
-  }) {
-    console.log('profile', profile);
+  }): Promise<User> {
     return await this.usersService.findOrCreate(profile);
   }
 
@@ -33,21 +28,27 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    const isMatch: boolean = bcrypt.compareSync(password, user.password);
+
+    const isMatch: boolean = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       throw new BadRequestException('Password does not match');
     }
     return user;
   }
 
-  login(user: { id: number; email: string }) {
+  login(user: { id: number; email: string }): AuthToken {
     const payload = { id: user.id, email: user.email };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async register(user: { email: string; password: string; name: string }) {
+  async register(user: {
+    email: string;
+    password: string;
+    name: string;
+  }): Promise<AuthToken> {
     const existingUser = await this.usersService.findOneByEmail(user.email);
     if (existingUser) {
       throw new BadRequestException('email already exists');

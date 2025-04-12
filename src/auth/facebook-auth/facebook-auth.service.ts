@@ -2,6 +2,16 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import axios from 'axios';
 
+interface FacebookResponse {
+  id: string;
+  name: string;
+  email: string;
+  picture: {
+    data: {
+      url: string;
+    };
+  };
+}
 @Injectable()
 export class FacebookAuthService {
   async verifyFacebookToken(token: string): Promise<{
@@ -12,7 +22,7 @@ export class FacebookAuthService {
     provider: string;
   }> {
     try {
-      const response = await axios.get(
+      const response = await axios.get<FacebookResponse>(
         `https://graph.facebook.com/me?fields=id,name,email,picture&access_token=${token}`,
       );
 

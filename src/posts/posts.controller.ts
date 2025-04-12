@@ -25,32 +25,26 @@ export class PostsController {
     console.log('req#$#', req.user);
     const createPostDto = { ...postDetails, userId: req.user.id };
     const newPostData = await this.postsService.create(createPostDto);
-    return { data: newPostData, status: 200 };
+    return newPostData;
   }
 
   @Get('list')
   @UseGuards(JwtAuthGuard)
   async findAll(@Request() req: { user: { id: number } }) {
     const data = await this.postsService.findAll({ userId: req.user.id });
-    return {
-      status: 200,
-      data,
-    };
+    return data;
   }
 
   @Get('trending')
   async findTrendingPosts(@Query('isTrending') isTrending: boolean) {
     console.log('dfdfdf', isTrending);
     const data = await this.postsService.findAll({ isTrending });
-    return {
-      status: 200,
-      data,
-    };
+    return data;
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const postDetails = await this.postsService.findOne(+id);
-    return { status: 200, data: postDetails };
+    return postDetails;
   }
 }
