@@ -47,20 +47,20 @@ export class AuthController {
     );
   }
 
+  @Post('registration')
+  async register(
+    @Body() registerBody: RegisterRequest,
+  ): Promise<{ access_token } | BadRequestException> {
+    const token = await this.authService.register(registerBody);
+    return { access_token: token.access_token };
+  }
+
   @UseGuards(AuthGuard('local'))
   @Post('login')
   login(@Request() req: { user: { id: number; email: string } }): {
     access_token: string;
   } {
     const token = this.authService.login(req.user);
-    return { access_token: token.access_token };
-  }
-
-  @Post('registration')
-  async register(
-    @Body() registerBody: RegisterRequest,
-  ): Promise<{ access_token } | BadRequestException> {
-    const token = await this.authService.register(registerBody);
     return { access_token: token.access_token };
   }
 

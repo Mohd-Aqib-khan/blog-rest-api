@@ -6,7 +6,8 @@ export default {
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
-  testMatch: ['**/*.spec.ts'], // Matches unit tests (e.g., auth.service.spec.ts)
+  testMatch: ['**/*.spec.ts', '**/*.spec.int.ts'], // Include both unit and integration test files
+  testPathIgnorePatterns: ['/node_modules/'],
   coverageDirectory: 'coverage',
   coverageThreshold: {
     global: {

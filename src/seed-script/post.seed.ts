@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { Post } from '../posts/entities/post.entity';
 import { User } from '../users/entities/user.entity';
 import { faker } from '@faker-js/faker';
+import * as bcrypt from 'bcrypt';
 
 // You can configure your data source here or import from a shared config
 const AppDataSource = new DataSource({
@@ -22,10 +23,29 @@ const seedPosts = async () => {
   const userRepo = AppDataSource.getRepository(User);
   const postRepo = AppDataSource.getRepository(Post);
 
-  const users = await userRepo.find();
+  let users = await userRepo.find();
+
+  // If no users, seed 2 dummy users with hashed passwords
   if (users.length === 0) {
-    console.error('No users found. Please seed users first.');
-    return;
+    const password = await bcrypt.hash('password123', 10);
+
+    const dummyUsers = [
+      userRepo.create({
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: password,
+      }),
+      userRepo.create({
+        name: 'Jane Smith',
+        email: 'jane@example.com',
+        password: password,
+      }),
+    ];
+
+    await userRepo.save(dummyUsers);
+    console.log('✅ Seeded 2 dummy users.');
+
+    users = await userRepo.find(); // Re-fetch for post assignment
   }
 
   const posts: Post[] = [];
@@ -45,6 +65,7 @@ const seedPosts = async () => {
       image: `https://picsum.photos/seed/${faker.string.uuid()}/600/400`,
       userId: user.id,
       isActive: true,
+      isTrending: i <= 10,
     });
 
     posts.push(post);
